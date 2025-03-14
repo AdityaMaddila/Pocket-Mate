@@ -43,8 +43,8 @@ const Herosection = () => {
                         <Image 
                             src="/banner.jpeg" 
                             alt="Banner" 
-                            width={800} 
-                            height={800} 
+                            width={900} 
+                            height={900} 
                             className={`rounded-lg shadow-2xl border mx-auto transition-all duration-1000 ${
                                 isVisible 
                                     ? 'opacity-100 translate-y-0 scale-100' 
