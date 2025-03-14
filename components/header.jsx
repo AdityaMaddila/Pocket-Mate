@@ -6,8 +6,8 @@ import { LayoutDashboard, PenBox } from "lucide-react";
 
 const Header = () => {
   return (
-    <div className="fixed top-0 w-full backdrop-blur-md z-50 border-b shadow-md">
-      <nav className="container mx-auto px-4 pb-1 pt-1 flex items-center justify-between">
+    <div className="fixed top-0 w-full backdrop-blur-md z-50 border-b shadow-md ">
+      <nav className="container mx-auto px-4 pb-1 pt-1 flex items-center justify-between gradient">
         <Link href="/">
           <Image
             src={"/logo.png"}
@@ -19,13 +19,13 @@ const Header = () => {
         </Link>
         <div className="flex items-center gap-4">
           <SignedIn>
-            <Link href={"/dashboard"} className="text-gray-900 hover:text-blue-900 flex items-center gap-2">
+            <Link href={"/dashboard"} className="text-white flex items-center gap-2">
               <Button className="flex items-center gap-2">
                 <LayoutDashboard size={18} />
                 <span className="hidden md:inline">Dashboard</span>
               </Button>
             </Link>
-            <Link href={"/transactions/create"} className="text-gray-900 hover:text-blue-900 flex items-center gap-2">
+            <Link href={"/transactions/create"} className="text-white flex items-center gap-2">
               <Button className="flex items-center gap-2">
                 <PenBox size={18} />
                 <span className="hidden md:inline">Add Transaction</span>

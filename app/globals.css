@@ -124,3 +124,16 @@
     @apply bg-background text-foreground;
   }
 }
+
+.gradient-title{
+  background: linear-gradient(90deg, #FFC0CB 0%, #4c036e 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.gradient{
+  background: linear-gradient(90deg, #4c036e 0%,  #FFC0CB 100%);
+
+}
+.bold{
+  font-weight: bold;
+}
