@@ -3,20 +3,23 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from "@/components/ui/button";
 import { LayoutDashboard, PenBox } from "lucide-react";
-
-const Header = () => {
+import { checkUser } from "@/lib/checkUser";
+const Header = async () => {
+  await checkUser();
   return (
     <div className="fixed top-0 w-full backdrop-blur-md z-50 shadow-md ">
       <nav className="container mx-auto px-4 pb-1 pt-1 flex items-center justify-between ">
-        <Link href="/">
-          <Image
-            src={"/logo.png"}
-            alt="Pocket-mate logo"
-            height={60}
-            width={200}
-            className="h-15 w-auto object-contain"
-          />
-        </Link>
+        <div className="">  
+          <Link href="/">
+            <Image
+              src={"/logo.png"}
+              alt="Pocket-mate logo"
+              height={60}
+              width={200}
+              className="h-15 w-auto object-contain"
+              />
+          </Link>
+        </div>
         <div className="flex items-center gap-4">
           <SignedIn>
             <Link href={"/dashboard"} className="text-white flex items-center gap-2">

@@ -17,7 +17,7 @@ export default function RootLayout({ children }) {
       <body className={`${inter.className}`}>
         <Header />
 
-        <main className="min-h-screen bg-[#121212]">{children}</main>
+        <main className="min-h-screen bg-[#121212] ">{children}</main>
         <Footer />
       </body>
       </ClerkProvider>

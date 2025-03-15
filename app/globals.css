@@ -151,3 +151,17 @@
   background-color: black;
   box-shadow: 0px 6px 15px rgba(187, 33, 125, 0.7); /* Equivalent to hover:shadow-lg */
 }
+@keyframes scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-scroll {
+  display: flex;
+  width: 100%; /* Double the width to accommodate duplicated content */
+  animation: scroll 20s linear infinite; /* Adjust duration as needed */
+}
