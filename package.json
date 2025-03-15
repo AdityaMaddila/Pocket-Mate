@@ -21,11 +21,15 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
+    "embla-carousel-react": "^8.5.2",
     "lucide-react": "^0.477.0",
     "next": "15.2.1",
     "react": "^19.0.0",
     "react-day-picker": "^8.10.1",
     "react-dom": "^19.0.0",
+    "react-slick": "^0.30.3",
+    "slick-carousel": "^1.8.1",
+    "swiper": "^11.2.5",
     "tailwind-merge": "^3.0.2",
     "tailwindcss-animate": "^1.0.7"
   },
@@ -34,6 +38,7 @@
     "@tailwindcss/postcss": "^4",
     "eslint": "^9",
     "eslint-config-next": "15.2.1",
+    "prisma": "^6.5.0",
     "tailwindcss": "^4"
   }
 }

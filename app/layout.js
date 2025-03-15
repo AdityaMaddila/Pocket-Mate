@@ -1,6 +1,7 @@
 import { Inter } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/header";
+import Footer from "@/components/footer";
 import { ClerkProvider } from "@clerk/nextjs";
 const inter= Inter({subsets: ["latin"]});
 
@@ -17,8 +18,7 @@ export default function RootLayout({ children }) {
         <Header />
 
         <main className="min-h-screen bg-[#121212]">{children}</main>
-        <footer className="text-center text-sm bg-[#121212] py-12 ">
-          </footer>
+        <Footer />
       </body>
       </ClerkProvider>
     </html>

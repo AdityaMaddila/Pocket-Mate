@@ -26,7 +26,7 @@ const Herosection = () => {
     }, []);
 
     return (
-        <div className="pb-30 px-5 pt-25">
+        <div className="pb-30 px-5 pt-35">
             <div className="container mx-auto text-center">
                 <h1 className="text-8xl md:text-8xl lg:text-7xl pb-8 gradient-title bold">Smart Finance, Smarter you.</h1> 
                 <p className="text-xl text-gray-400 mb-8 max-w-2xl mx-auto">An intelligent way to manage your finances—because your money should work as smart as you do!</p>
