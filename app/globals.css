@@ -137,3 +137,17 @@
 .bold{
   font-weight: bold;
 }
+.button {
+  background-color: #1f2937; /* Equivalent to bg-gray-800 */
+  color: rgb(211, 204, 204);
+  padding: 24px; /* Equivalent to p-6 */
+  border: none; /* Equivalent to border-none */
+  border-radius: 12px; /* Equivalent to rounded-lg */
+  transition: box-shadow 0.3s ease-in-out; /* Equivalent to transition-shadow */
+  box-shadow: 0px 4px 10px rgba(88, 0, 48, 0.5); /* Equivalent to shadow-pink-500/50 */
+}
+
+.button:hover {
+  background-color: black;
+  box-shadow: 0px 6px 15px rgba(187, 33, 125, 0.7); /* Equivalent to hover:shadow-lg */
+}

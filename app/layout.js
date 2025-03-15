@@ -16,13 +16,8 @@ export default function RootLayout({ children }) {
       <body className={`${inter.className}`}>
         <Header />
 
-        <main className="min-h-screen">{children}</main>
-        <footer className="text-center text-sm bg-blue-50 py-12 ">
-          <div className="container mx-auto text-center text-lg text-black">
-          <p>© 2025 Pocket Mate</p>
-
-          </div>
-          
+        <main className="min-h-screen bg-[#121212]">{children}</main>
+        <footer className="text-center text-sm bg-[#121212] py-12 ">
           </footer>
       </body>
       </ClerkProvider>

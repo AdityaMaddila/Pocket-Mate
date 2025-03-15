@@ -15,10 +15,20 @@ import {
         "Get detailed insights into your spending patterns with AI-powered analytics",
     },
     {
+      icon: <Zap className="h-8 w-8 text-pink-400" />,
+      title: "Automated Insights",
+      description: "Get automated financial insights and recommendations",
+    },
+    {
       icon: <Receipt className="h-8 w-8 text-pink-400" />,
       title: "Smart Receipt Scanner",
       description:
         "Extract data automatically from receipts using advanced AI technology",
+    },
+    {
+      icon: <Globe className="h-8 w-8 text-pink-400" />,
+      title: "Multi-Currency",
+      description: "Support for multiple currencies with real-time conversion",
     },
     {
       icon: <PieChart className="h-8 w-8 text-pink-400" />,
@@ -29,16 +39,6 @@ import {
       icon: <CreditCard className="h-8 w-8 text-pink-400" />,
       title: "Multi-Account Support",
       description: "Manage multiple accounts and credit cards in one place",
-    },
-    {
-      icon: <Globe className="h-8 w-8 text-pink-400" />,
-      title: "Multi-Currency",
-      description: "Support for multiple currencies with real-time conversion",
-    },
-    {
-      icon: <Zap className="h-8 w-8 text-pink-400" />,
-      title: "Automated Insights",
-      description: "Get automated financial insights and recommendations",
     },
   ];
   

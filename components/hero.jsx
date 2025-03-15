@@ -29,10 +29,10 @@ const Herosection = () => {
         <div className="pb-30 px-5 pt-25">
             <div className="container mx-auto text-center">
                 <h1 className="text-8xl md:text-8xl lg:text-7xl pb-8 gradient-title bold">Smart Finance, Smarter you.</h1> 
-                <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">An intelligent way to manage your finances—because your money should work as smart as you do!</p>
+                <p className="text-xl text-gray-400 mb-8 max-w-2xl mx-auto">An intelligent way to manage your finances—because your money should work as smart as you do!</p>
                 <div className="flex justify-center gap-4">
                     <Link href="/dashboard">
-                        <Button size="lg" className="px-8">Get Started</Button>
+                        <Button size="lg" className="button text-xl">Get Started</Button>
                     </Link>
                 </div>
                 <div>
@@ -45,7 +45,7 @@ const Herosection = () => {
                             alt="Banner" 
                             width={900} 
                             height={900} 
-                            className={`rounded-lg shadow-2xl border mx-auto transition-all duration-1000 ${
+                            className={`rounded-lg shadow-2xl mx-auto transition-all duration-1000 ${
                                 isVisible 
                                     ? 'opacity-100 translate-y-0 scale-100' 
                                     : 'opacity-0 translate-y-10 scale-95'
