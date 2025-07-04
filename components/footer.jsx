@@ -1,13 +1,18 @@
 import React from "react";
-const Footer =() =>{
-    return (
-        <div className=" h-30 w-full backdrop-blur-md z-50 shadow-md bg-gray-900 flex items-center justify-center">
-            <div className="flex items-center">
-                <p className="gradient-title text-2xl font-bold">Pocket Mate @ 2025</p>
-            </div>
 
-        </div>
+const Footer = () => {
+  return (
+    <footer className="w-full bg-gradient-to-r from-gray-800 via-gray-900 to-black text-white py-6 px-4 shadow-inner z-50">
+      <div className="flex flex-col items-center justify-center">
+        <h1 className="text-2xl font-bold tracking-wide">
+          Pocket Mate <span className="text-pink-400">@ 2025</span>
+        </h1>
+        <p className="text-sm text-gray-400 mt-2">
+          Built with ❤️ using React & Tailwind CSS
+        </p>
+      </div>
+    </footer>
+  );
+};
 
-    )
-}
 export default Footer;
