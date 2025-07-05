@@ -1,3 +1,4 @@
+"use server";
 import { db } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
@@ -21,14 +22,14 @@ export async function createAccount(data) {
         }
         const balanceFloat=parseFloat(data.balance)
         if(isNaN(balanceFloat)){
-            throw new Error("User not found");
+            throw new Error("Invalid balance value");
         }
         const existingAccounts=await db.account.findMany({
             where:{userId: user.id},
         });
-        const shouldbeDefault=
-        existingAccounts.lenght===0? true:data.isDefault;
-        if(shouldbeDefault){
+        const shouldBeDefault=
+        existingAccounts.length===0? true:data.isDefault;
+        if(shouldBeDefault){
             await db.account.updateMany({
                 where:{userId:user.id,isDefault:true},
                 data: {isDefault:false},
