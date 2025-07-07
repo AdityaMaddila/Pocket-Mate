@@ -15,7 +15,7 @@ const DashboardPage = async () => {
       <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
         {/* Create Account Card */}
         <CreateAccountDrawer>
-          <Card className="h-full border-dashed border-2 border-gray-300 hover:border-gray-400 transition-colors duration-200">
+          <Card className="h-full border-2 border-gray-300 hover:border-4 border-gray-400 transition-colors duration-200">
             <CardContent className="h-full flex flex-col items-start justify-center p-6">
               <Plus className="w-7 h-7 text-gray-600 mb-3" />
               <h2 className="text-lg font-medium text-gray-700">

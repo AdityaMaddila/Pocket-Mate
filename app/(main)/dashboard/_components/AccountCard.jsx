@@ -1,13 +1,55 @@
-import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
-import { Switch } from "@/components/ui/switch";
-import Link from "next/link";
-import { ArrowDownRight, ArrowUpRight } from "lucide-react";
-import React from "react";
+"use client";
 
-const AccountCard = ({ account }) => {
+import { ArrowUpRight, ArrowDownRight, CreditCard } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { useEffect } from "react";
+import useFetch from "@/hooks/use-fetch";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import Link from "next/link";
+import { UpdateDefaultAccount } from "@/actions/accounts";
+import { toast } from "sonner";
+
+export function AccountCard({ account }) {
+  const { name, type, balance, id, isDefault } = account;
+
+  const {
+    loading: updateDefaultLoading,
+    fn: updateDefaultFn,
+    data: updatedAccount,
+    error,
+  } = useFetch(UpdateDefaultAccount);
+
+  const handleDefaultChange = async (event) => {
+    event.preventDefault(); // Prevent navigation
+
+    if (isDefault) {
+      toast.warning("You need atleast 1 default account");
+      return; // Don't allow toggling off the default account
+    }
+
+    await updateDefaultFn(id);
+  };
+
+  useEffect(() => {
+    if (updatedAccount?.success) {
+      toast.success("Default account updated successfully");
+    }
+  }, [updatedAccount]);
+
+  useEffect(() => {
+    if (error) {
+      toast.error(error.message || "Failed to update default account");
+    }
+  }, [error]);
   return (
-    <Link href={`/account/${account.id}`} className="block h-full">
-      <Card className="h-full flex flex-col justify-between border border-gray-200 hover:shadow-sm transition-shadow duration-200 rounded-xl px-5 py-6">
+    <Card className="h-full flex flex-col justify-between border border-gray-200 hover:shadow-sm transition-shadow duration-200 rounded-xl px-5 py-6">
+        <Link href={`/account/${account.id}`} className="block h-full">
         <CardHeader className="p-0 flex flex-row items-start justify-between">
           <div>
             <CardTitle className="text-lg font-semibold text-gray-900">
@@ -17,7 +59,7 @@ const AccountCard = ({ account }) => {
               {account.type.charAt(0).toUpperCase() + account.type.slice(1).toLowerCase()} Account
             </p>
           </div>
-          <Switch />
+          <Switch checked={account.isDefault} onClick={handleDefaultChange}/>
         </CardHeader>
 
         <CardContent className="p-0 mt-6 flex-1 flex flex-col justify-center">
@@ -36,8 +78,8 @@ const AccountCard = ({ account }) => {
             <span>Expense</span>
           </div>
         </CardFooter>
-      </Card>
     </Link>
+      </Card>
   );
 };
 
