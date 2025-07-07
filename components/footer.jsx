@@ -8,7 +8,7 @@ const Footer = () => {
           Pocket Mate <span className="text-pink-400">@ 2025</span>
         </h1>
         <p className="text-sm text-gray-400 mt-2">
-          Built with ❤️ using React & Tailwind CSS
+          Built with Next.JS & Tailwind CSS
         </p>
       </div>
     </footer>
