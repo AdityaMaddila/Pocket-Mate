@@ -1,38 +1,48 @@
+import { Suspense } from "react";
 import { getAccountWithTransactions } from "@/actions/accounts";
-import { parse } from "date-fns";
-import { notFound } from "next/navigation";
-import React from "react";
 import { BarLoader } from "react-spinners";
-import TransactionTable from "../_components/transactiontable";
+import { TransactionTable } from "../_components/transactiontable";
+import { notFound } from "next/navigation";
+import { AccountChart } from "../_components/account-chart"; // ← regular import
+export const dynamic = "force-dynamic";
+export default async function AccountPage({ params }) {
+  const accountData = await getAccountWithTransactions(params.id);
 
-const AccountsPage = async({params}) => {
-    const accountData = await getAccountWithTransactions(params.id);
-    if (!accountData) {
-        notFound();
-}
-const {transactions, ...account} = accountData;
-return (
-  <div className="text-white w-full px-5 py-4 flex justify-between items-end">
-    <div className="space-y-1">
-      <h1 className="text-xl font-semibold gradient-title">{account.name}</h1>
-      <p className="text-sm text-gray-300">
-        {account.type.charAt(0) + account.type.slice(1).toLowerCase()} Account
-      </p>
-    </div>
+  if (!accountData) {
+    notFound();
+  }
 
-    <div className="text-right space-y-1">
-      <div className="text-2xl font-bold gradient-title">
-        ${parseFloat(account.balance).toFixed(2)}
+  const { transactions, ...account } = accountData;
+
+  return (
+    <div className="space-y-8 px-5">
+      <div className="flex gap-4 items-end justify-between">
+        <div>
+          <h1 className="text-5xl sm:text-6xl font-bold tracking-tight gradient-title capitalize">
+            {account.name}
+          </h1>
+          <p className="text-muted-foreground">
+            {account.type.charAt(0) + account.type.slice(1).toLowerCase()} Account
+          </p>
+        </div>
+
+        <div className="text-right pb-2">
+          <div className="text-xl sm:text-2xl font-bold gradient-title">
+            ${parseFloat(account.balance).toFixed(2)}
+          </div>
+          <p className="text-sm text-muted-foreground">
+            {account._count.transactions} Transactions
+          </p>
+        </div>
       </div>
-      <p className="text-sm text-gray-300">
-        {account._count.transactions} Transactions
-      </p>
-    </div>
-    <Suspense fallback={<BarLoader className="mt-4" width={"100%"} color="#9333ea"/>}>
-    <TransactionTable transactions={transactions}/>
-    </Suspense>
-  </div>
-);
-}
 
-export default AccountsPage;
+      <Suspense fallback={<BarLoader className="mt-4" width={"100%"} color="#9333ea" />}>
+        <AccountChart transactions={transactions} />
+      </Suspense>
+
+      <Suspense fallback={<BarLoader className="mt-4" width={"100%"} color="#9333ea" />}>
+        <TransactionTable transactions={transactions} />
+      </Suspense>
+    </div>
+  );
+}

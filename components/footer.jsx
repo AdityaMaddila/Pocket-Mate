@@ -2,13 +2,13 @@ import React from "react";
 
 const Footer = () => {
   return (
-    <footer className="w-full bg-gradient-to-r from-gray-800 via-gray-900 to-black text-white py-6 px-4 shadow-inner z-50">
-      <div className="flex flex-col items-center justify-center">
-        <h1 className="text-2xl font-bold tracking-wide">
-          Pocket Mate <span className="text-pink-400">@ 2025</span>
-        </h1>
-        <p className="text-sm text-gray-400 mt-2">
-          Built with Next.JS & Tailwind CSS
+    <footer className="w-full bg-black text-gray-400 py-4 px-4 text-center border-t border-gray-800">
+      <div className="space-y-1">
+        <p className="text-sm font-medium text-gray-300">
+          Pocket Mate <span className="text-gray-500">© 2025</span>
+        </p>
+        <p className="text-xs text-gray-500">
+          Built with Next.js & Tailwind CSS
         </p>
       </div>
     </footer>
