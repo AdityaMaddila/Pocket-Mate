@@ -1,8 +1,9 @@
 "use client";
 
-import { ArrowUpRight, ArrowDownRight, CreditCard } from "lucide-react";
+import { ArrowUpRight, ArrowDownRight, Loader2 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import useFetch from "@/hooks/use-fetch";
 import {
   Card,
@@ -11,12 +12,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import Link from "next/link";
 import { UpdateDefaultAccount } from "@/actions/accounts";
 import { toast } from "sonner";
 
 export function AccountCard({ account }) {
   const { name, type, balance, id, isDefault } = account;
+  const [isNavigating, setIsNavigating] = useState(false);
+  const router = useRouter();
 
   const {
     loading: updateDefaultLoading,
@@ -26,11 +28,12 @@ export function AccountCard({ account }) {
   } = useFetch(UpdateDefaultAccount);
 
   const handleDefaultChange = async (event) => {
-    event.preventDefault(); // Prevent navigation
+    event.stopPropagation();
+    event.preventDefault();
 
     if (isDefault) {
-      toast.warning("You need atleast 1 default account");
-      return; // Don't allow toggling off the default account
+      toast.warning("You need at least 1 default account");
+      return;
     }
 
     await updateDefaultFn(id);
@@ -47,40 +50,62 @@ export function AccountCard({ account }) {
       toast.error(error.message || "Failed to update default account");
     }
   }, [error]);
+
+  const handleNavigate = () => {
+    setIsNavigating(true);
+    router.push(`/account/${id}`);
+  };
+
   return (
-    <Card className="h-full flex flex-col justify-between border border-gray-200 hover:shadow-sm transition-shadow duration-200 rounded-xl px-5 py-6">
-        <Link href={`/account/${account.id}`} className="block h-full">
-        <CardHeader className="p-0 flex flex-row items-start justify-between">
-          <div>
-            <CardTitle className="text-lg font-semibold text-gray-900">
-              {account.name}
-            </CardTitle>
-            <p className="text-sm text-gray-500 mt-1">
-              {account.type.charAt(0).toUpperCase() + account.type.slice(1).toLowerCase()} Account
-            </p>
-          </div>
-          <Switch checked={account.isDefault} onClick={handleDefaultChange}/>
-        </CardHeader>
+    <Card
+      onClick={handleNavigate}
+      className="h-full flex flex-col justify-between border border-zinc-800 hover:shadow-lg bg-gradient-to-br from-zinc-900 via-zinc-950 to-black rounded-xl px-5 py-6 cursor-pointer transition duration-200"
+    >
+      {isNavigating ? (
+        <div className="flex flex-col items-center justify-center h-full space-y-3 text-purple-200 animate-pulse">
+          <Loader2 className="w-6 h-6 animate-spin text-purple-500" />
+          <p className="text-sm tracking-wide text-purple-300">
+            Loading <span className="font-semibold text-white">{account.name}</span>'s account...
+          </p>
+        </div>
+      ) : (
+        <>
+          <CardHeader className="p-0 flex flex-row items-start justify-between">
+            <div>
+              <CardTitle className="text-lg font-semibold text-white">
+                {name}
+              </CardTitle>
+              <p className="text-sm text-zinc-400 mt-1">
+                {type.charAt(0).toUpperCase() + type.slice(1).toLowerCase()} Account
+              </p>
+            </div>
+            <Switch
+              checked={isDefault}
+              onClick={handleDefaultChange}
+              
+            />
+          </CardHeader>
 
-        <CardContent className="p-0 mt-6 flex-1 flex flex-col justify-center">
-          <div className="text-3xl font-bold text-gray-800">
-            ₹{parseFloat(account.balance).toFixed(2)}
-          </div>
-        </CardContent>
+          <CardContent className="p-0 mt-6 flex-1 flex flex-col justify-center">
+            <div className="text-3xl font-bold text-zinc-100">
+              ₹{parseFloat(balance).toFixed(2)}
+            </div>
+          </CardContent>
 
-        <CardFooter className="p-0 mt-6 flex justify-between text-sm text-gray-600">
-          <div className="flex items-center space-x-2">
-            <ArrowUpRight className="h-4 w-4 text-green-500" />
-            <span>Income</span>
-          </div>
-          <div className="flex items-center space-x-2">
-            <ArrowDownRight className="h-4 w-4 text-red-500" />
-            <span>Expense</span>
-          </div>
-        </CardFooter>
-    </Link>
-      </Card>
+          <CardFooter className="p-0 mt-6 flex justify-between text-sm text-zinc-400">
+            <div className="flex items-center space-x-2">
+              <ArrowUpRight className="h-4 w-4 text-green-400" />
+              <span>Income</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <ArrowDownRight className="h-4 w-4 text-red-400" />
+              <span>Expense</span>
+            </div>
+          </CardFooter>
+        </>
+      )}
+    </Card>
   );
-};
+}
 
 export default AccountCard;

@@ -1,57 +1,91 @@
+"use client";
+
 import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
-import Image from 'next/image';
-import Link from 'next/link';
+import Image from "next/image";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
-import { LayoutDashboard, PenBox } from "lucide-react";
-import { checkUser } from "@/lib/checkUser";
-const Header = async () => {
-  await checkUser();
+import { LayoutDashboard, PenBox, Loader2 } from "lucide-react";
+
+const Header = () => {
+  const router = useRouter();
+  const [isPending, startTransition] = useTransition();
+
+  const handleNavigation = (path) => {
+    startTransition(() => {
+      router.push(path);
+    });
+  };
+
   return (
-    <div className="fixed top-0 w-full backdrop-blur-md z-50 shadow-md ">
-      <nav className="container mx-auto px-4 pb-1 pt-1 flex items-center justify-between ">
-        <div className="">  
-          <Link href="/">
+    <>
+      {/* Loader Overlay with smooth fade */}
+      <div
+        className={`fixed inset-0 z-[100] bg-black/40 backdrop-blur-sm flex items-center justify-center transition-opacity duration-300 ${
+          isPending ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+        }`}
+      >
+        <Loader2 className="h-10 w-10 text-white animate-spin" />
+      </div>
+
+      <header className="fixed top-0 w-full z-50 backdrop-blur-lg bg-gradient-to-r from-zinc-900/40 via-zinc-800/30 to-zinc-900/40 border-b border-zinc-600/30 shadow-[0_4px_30px_rgba(0,0,0,0.15)] transition-all duration-300">
+        <nav className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
+          {/* Logo */}
+          <Link href="/" className="flex items-center">
             <Image
-              src={"/logo.png"}
+              src="/logo.png"
               alt="Pocket-mate logo"
-              height={60}
-              width={200}
-              className="h-15 w-auto object-contain"
-              />
-          </Link>
-        </div>
-        <div className="flex items-center gap-4">
-          <SignedIn>
-            <Link href={"/dashboard"} className="text-white flex items-center gap-2">
-              <Button className="flex items-center gap-2 button ">
-                <LayoutDashboard size={18} />
-                <span className="hidden md:inline">Dashboard</span>
-              </Button>
-            </Link>
-            <Link href={"/transaction/create"} className="text-white flex items-center gap-2">
-              <Button className="flex items-center gap-2 button">
-                <PenBox size={18} />
-                <span className="hidden md:inline">Add Transaction</span>
-              </Button>
-            </Link>
-          </SignedIn>
-          <SignedOut>
-            <SignInButton forceRedirectUrl="/dashboard">
-              <Button className="button">Login</Button>
-            </SignInButton>
-          </SignedOut>
-          <SignedIn>
-            <UserButton
-              appearance={{
-                elements: {
-                  avatarBox: "w-12 h-12 rounded-full", // Increased size here
-                },
-              }}
+              width={160}
+              height={50}
+              className="object-contain h-12 w-auto"
             />
-          </SignedIn>
-        </div>
-      </nav>
-    </div>
+          </Link>
+
+          {/* Navigation / Auth Controls */}
+          <div className="flex items-center gap-4 sm:gap-6">
+            <SignedIn>
+              {/* Dashboard Button */}
+              <Button
+                onClick={() => handleNavigation("/dashboard")}
+                className="flex items-center gap-2 text-white text-base px-4 py-2 hover:bg-zinc-700/50 transition-colors duration-200 rounded-md"
+              >
+                <LayoutDashboard size={20} />
+                <span className="hidden md:inline font-medium">Dashboard</span>
+              </Button>
+
+              {/* Add Transaction Button */}
+              <Button
+                onClick={() => handleNavigation("/transaction/create")}
+                className="flex items-center gap-2 text-white text-base px-4 py-2 hover:bg-zinc-700/50 transition-colors duration-200 rounded-md"
+              >
+                <PenBox size={20} />
+                <span className="hidden md:inline font-medium">Add Transaction</span>
+              </Button>
+            </SignedIn>
+
+            <SignedOut>
+              <SignInButton forceRedirectUrl="/dashboard">
+                <Button className="bg-blue-600 hover:bg-blue-700 text-white text-base px-5 py-2 rounded-md transition-colors duration-200 shadow-md hover:shadow-lg">
+                  Login
+                </Button>
+              </SignInButton>
+            </SignedOut>
+
+            <SignedIn>
+              <UserButton
+                appearance={{
+                  elements: {
+                    avatarBox:
+                      "w-11 h-11 rounded-full border border-zinc-600 shadow-inner hover:shadow-md transition-shadow duration-200",
+                  },
+                }}
+              />
+            </SignedIn>
+          </div>
+        </nav>
+      </header>
+    </>
   );
 };
 

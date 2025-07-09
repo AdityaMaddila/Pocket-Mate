@@ -379,7 +379,7 @@ export function TransactionTable({ transactions }) {
                               variant="secondary"
                               className="gap-1 bg-purple-100 text-purple-700 hover:bg-purple-200"
                             >
-                              <RefreshCw className="h-3 w-3" />
+                              <RefreshCw className="h-3 w-3 text-white" />
                               {
                                 RECURRING_INTERVALS[
                                   transaction.recurringInterval
@@ -401,8 +401,8 @@ export function TransactionTable({ transactions }) {
                         </Tooltip>
                       </TooltipProvider>
                     ) : (
-                      <Badge variant="outline" className="gap-1">
-                        <Clock className="h-3 w-3" />
+                      <Badge variant="outline" className="gap-1 text-white">
+                        <Clock className="h-3 w-3 text-white" />
                         One-time
                       </Badge>
                     )}
@@ -442,28 +442,42 @@ export function TransactionTable({ transactions }) {
       </div>
 
       {totalPages > 1 && (
-        <div className="flex items-center justify-center gap-2">
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={() => handlePageChange(currentPage - 1)}
-            disabled={currentPage === 1}
-          >
-            <ChevronLeft className="h-4 w-4" />
-          </Button>
-          <span className="text-sm">
-            Page {currentPage} of {totalPages}
-          </span>
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={() => handlePageChange(currentPage + 1)}
-            disabled={currentPage === totalPages}
-          >
-            <ChevronRight className="h-4 w-4" />
-          </Button>
-        </div>
+  <div className="flex items-center justify-center gap-4 mt-6">
+    <Button
+      onClick={() => handlePageChange(currentPage - 1)}
+      disabled={currentPage === 1}
+      className={cn(
+        "rounded-md px-3 py-2 text-sm transition-all duration-200 shadow-md",
+        currentPage === 1
+          ? "bg-muted text-gray-500 cursor-not-allowed"
+          : "bg-gray-800 text-white hover:bg-gray-700 hover:shadow-lg"
       )}
+    >
+      <ChevronLeft className="h-4 w-4" />
+    </Button>
+
+    <div className="text-sm text-gray-400">
+      Page{" "}
+      <span className="text-white font-semibold">{currentPage}</span> of{" "}
+      <span className="text-white font-semibold">{totalPages}</span>
+    </div>
+
+    <Button
+      onClick={() => handlePageChange(currentPage + 1)}
+      disabled={currentPage === totalPages}
+      className={cn(
+        "rounded-md px-3 py-2 text-sm transition-all duration-200 shadow-md",
+        currentPage === totalPages
+          ? "bg-muted text-gray-500 cursor-not-allowed"
+          : "bg-gray-800 text-white hover:bg-gray-700 hover:shadow-lg"
+      )}
+    >
+      <ChevronRight className="h-4 w-4" />
+    </Button>
+  </div>
+)}
+
+
     </div>
   );
 }
