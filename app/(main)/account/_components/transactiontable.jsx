@@ -122,6 +122,7 @@ export function TransactionTable({ transactions }) {
   const totalPages = Math.ceil(
     filteredAndSortedTransactions.length / ITEMS_PER_PAGE
   );
+
   const paginatedTransactions = useMemo(() => {
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
     return filteredAndSortedTransactions.slice(
@@ -190,13 +191,13 @@ export function TransactionTable({ transactions }) {
   };
 
   return (
-    <div className="space-y-4 text-white">
-      {deleteLoading && (
-        <BarLoader className="mt-4" width={"100%"} color="#9333ea" />
-      )}
-      <div className="flex flex-col sm:flex-row gap-4">
+    <div className="space-y-6 text-white bg-zinc-900/30 p-4 rounded-xl shadow-lg border border-zinc-700">
+      {deleteLoading && <BarLoader width={"100%"} color="#9333ea" />}
+
+      {/* Filters and actions */}
+      <div className="flex flex-col md:flex-row gap-4">
         <div className="relative flex-1">
-          <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Search className="absolute left-2 top-2.5 h-4 w-4 text-zinc-400" />
           <Input
             placeholder="Search transactions..."
             value={searchTerm}
@@ -204,10 +205,11 @@ export function TransactionTable({ transactions }) {
               setSearchTerm(e.target.value);
               setCurrentPage(1);
             }}
-            className="pl-8"
+            className="pl-8 bg-zinc-800/60 border border-zinc-600 text-white placeholder:text-zinc-400"
           />
         </div>
-        <div className="flex gap-2">
+
+        <div className="flex flex-wrap gap-2">
           <Select
             value={typeFilter}
             onValueChange={(value) => {
@@ -215,10 +217,10 @@ export function TransactionTable({ transactions }) {
               setCurrentPage(1);
             }}
           >
-            <SelectTrigger className="w-[130px]">
+            <SelectTrigger className="w-[130px] bg-zinc-800/60 border-zinc-600">
               <SelectValue placeholder="All Types" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-zinc-800 text-white">
               <SelectItem value="INCOME">Income</SelectItem>
               <SelectItem value="EXPENSE">Expense</SelectItem>
             </SelectContent>
@@ -231,46 +233,47 @@ export function TransactionTable({ transactions }) {
               setCurrentPage(1);
             }}
           >
-            <SelectTrigger className="w-[130px]">
+            <SelectTrigger className="w-[160px] bg-zinc-800/60 border-zinc-600">
               <SelectValue placeholder="All Transactions" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-zinc-800 text-white">
               <SelectItem value="recurring">Recurring Only</SelectItem>
               <SelectItem value="non-recurring">Non-recurring Only</SelectItem>
             </SelectContent>
           </Select>
 
           {selectedIds.length > 0 && (
-            <div className="flex items-center gap-2">
-              <Button
-                variant="destructive"
-                size="sm"
-                onClick={handleBulkDelete}
-              >
-                <Trash className="h-4 w-4 mr-2" />
-                Delete Selected ({selectedIds.length})
-              </Button>
-            </div>
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={handleBulkDelete}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              <Trash className="h-4 w-4 mr-2" />
+              Delete Selected ({selectedIds.length})
+            </Button>
           )}
 
           {(searchTerm || typeFilter || recurringFilter) && (
             <Button
-              variant="outline"
+              variant="ghost"
               size="icon"
               onClick={handleClearFilters}
+              className="text-white hover:text-red-400"
               title="Clear filters"
             >
-              <X className="h-4 w-5" />
+              <X className="h-4 w-4" />
             </Button>
           )}
         </div>
       </div>
 
-      <div className="rounded-md border">
+      {/* Table */}
+      <div className="rounded-lg border border-zinc-700 overflow-x-auto bg-zinc-800/30">
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-[50px] gradient-title">
+              <TableHead>
                 <Checkbox
                   checked={
                     selectedIds.length === paginatedTransactions.length &&
@@ -279,11 +282,8 @@ export function TransactionTable({ transactions }) {
                   onCheckedChange={handleSelectAll}
                 />
               </TableHead>
-              <TableHead
-                className="cursor-pointer gradient-title"
-                onClick={() => handleSort("date")}
-              >
-                <div className="flex items-center">
+              <TableHead onClick={() => handleSort("date")} className="cursor-pointer">
+                <div className="flex items-center gradient-title">
                   Date
                   {sortConfig.field === "date" &&
                     (sortConfig.direction === "asc" ? (
@@ -294,11 +294,8 @@ export function TransactionTable({ transactions }) {
                 </div>
               </TableHead>
               <TableHead className="gradient-title">Description</TableHead>
-              <TableHead
-                className="cursor-pointer gradient-title"
-                onClick={() => handleSort("category")}
-              >
-                <div className="flex items-center">
+              <TableHead onClick={() => handleSort("category")} className="cursor-pointer">
+                <div className="flex items-center gradient-title">
                   Category
                   {sortConfig.field === "category" &&
                     (sortConfig.direction === "asc" ? (
@@ -309,10 +306,10 @@ export function TransactionTable({ transactions }) {
                 </div>
               </TableHead>
               <TableHead
-                className="cursor-pointer text-right gradient-title"
                 onClick={() => handleSort("amount")}
+                className="text-right cursor-pointer"
               >
-                <div className="flex items-center justify-end">
+                <div className="flex justify-end items-center gradient-title">
                   Amount
                   {sortConfig.field === "amount" &&
                     (sortConfig.direction === "asc" ? (
@@ -323,16 +320,14 @@ export function TransactionTable({ transactions }) {
                 </div>
               </TableHead>
               <TableHead className="gradient-title">Recurring</TableHead>
-              <TableHead className="w-[50px] gradient-title" />
+              <TableHead />
             </TableRow>
           </TableHeader>
+
           <TableBody>
             {paginatedTransactions.length === 0 ? (
               <TableRow>
-                <TableCell
-                  colSpan={7}
-                  className="text-center text-muted-foreground"
-                >
+                <TableCell colSpan={7} className="text-center text-zinc-400">
                   No transactions found
                 </TableCell>
               </TableRow>
@@ -345,26 +340,24 @@ export function TransactionTable({ transactions }) {
                       onCheckedChange={() => handleSelect(transaction.id)}
                     />
                   </TableCell>
-                  <TableCell>
-                    {format(new Date(transaction.date), "PP")}
-                  </TableCell>
+                  <TableCell>{format(new Date(transaction.date), "PP")}</TableCell>
                   <TableCell>{transaction.description}</TableCell>
-                  <TableCell className="capitalize">
+                  <TableCell>
                     <span
                       style={{
                         background: categoryColors[transaction.category],
                       }}
-                      className="px-2 py-1 rounded text-white text-sm"
+                      className="px-2 py-1 rounded-full text-white text-xs"
                     >
                       {transaction.category}
                     </span>
                   </TableCell>
                   <TableCell
                     className={cn(
-                      "text-right font-medium",
+                      "text-right font-semibold",
                       transaction.type === "EXPENSE"
-                        ? "text-red-500"
-                        : "text-green-500"
+                        ? "text-red-400"
+                        : "text-green-400"
                     )}
                   >
                     {transaction.type === "EXPENSE" ? "-" : "+"}$
@@ -377,33 +370,25 @@ export function TransactionTable({ transactions }) {
                           <TooltipTrigger>
                             <Badge
                               variant="secondary"
-                              className="gap-1 bg-purple-100 text-purple-700 hover:bg-purple-200"
+                              className="bg-purple-700 text-white"
                             >
-                              <RefreshCw className="h-3 w-3 text-white" />
-                              {
-                                RECURRING_INTERVALS[
-                                  transaction.recurringInterval
-                                ]
-                              }
+                              <RefreshCw className="h-3 w-3 mr-1" />
+                              {RECURRING_INTERVALS[transaction.recurringInterval]}
                             </Badge>
                           </TooltipTrigger>
                           <TooltipContent>
                             <div className="text-sm">
                               <div className="font-medium">Next Date:</div>
                               <div>
-                                {format(
-                                  new Date(transaction.nextRecurringDate),
-                                  "PPP"
-                                )}
+                                {format(new Date(transaction.nextRecurringDate), "PPP")}
                               </div>
                             </div>
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
                     ) : (
-                      <Badge variant="outline" className="gap-1 text-white">
-                        <Clock className="h-3 w-3 text-white" />
-                        One-time
+                      <Badge variant="outline" className="text-white border-white">
+                        <Clock className="h-3 w-3 mr-1" /> One-time
                       </Badge>
                     )}
                   </TableCell>
@@ -417,16 +402,14 @@ export function TransactionTable({ transactions }) {
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem
                           onClick={() =>
-                            router.push(
-                              `/transaction/create?edit=${transaction.id}`
-                            )
+                            router.push(`/transaction/create?edit=${transaction.id}`)
                           }
                         >
                           Edit
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem
-                          className="text-destructive"
+                          className="text-red-500"
                           onClick={() => deleteFn([transaction.id])}
                         >
                           Delete
@@ -441,43 +424,29 @@ export function TransactionTable({ transactions }) {
         </Table>
       </div>
 
+      {/* Pagination */}
       {totalPages > 1 && (
-  <div className="flex items-center justify-center gap-4 mt-6">
-    <Button
-      onClick={() => handlePageChange(currentPage - 1)}
-      disabled={currentPage === 1}
-      className={cn(
-        "rounded-md px-3 py-2 text-sm transition-all duration-200 shadow-md",
-        currentPage === 1
-          ? "bg-muted text-gray-500 cursor-not-allowed"
-          : "bg-gray-800 text-white hover:bg-gray-700 hover:shadow-lg"
+        <div className="flex justify-center items-center gap-6 pt-4">
+          <Button
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage === 1}
+            className="rounded-md bg-zinc-800 hover:bg-zinc-700 px-3 py-1 disabled:opacity-40"
+          >
+            <ChevronLeft className="h-4 w-4 text-white" />
+          </Button>
+          <p className="text-sm text-zinc-300">
+            Page <span className="font-semibold text-white">{currentPage}</span> of{" "}
+            <span className="font-semibold text-white">{totalPages}</span>
+          </p>
+          <Button
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={currentPage === totalPages}
+            className="rounded-md bg-zinc-800 hover:bg-zinc-700 px-3 py-1 disabled:opacity-40"
+          >
+            <ChevronRight className="h-4 w-4 text-white" />
+          </Button>
+        </div>
       )}
-    >
-      <ChevronLeft className="h-4 w-4" />
-    </Button>
-
-    <div className="text-sm text-gray-400">
-      Page{" "}
-      <span className="text-white font-semibold">{currentPage}</span> of{" "}
-      <span className="text-white font-semibold">{totalPages}</span>
-    </div>
-
-    <Button
-      onClick={() => handlePageChange(currentPage + 1)}
-      disabled={currentPage === totalPages}
-      className={cn(
-        "rounded-md px-3 py-2 text-sm transition-all duration-200 shadow-md",
-        currentPage === totalPages
-          ? "bg-muted text-gray-500 cursor-not-allowed"
-          : "bg-gray-800 text-white hover:bg-gray-700 hover:shadow-lg"
-      )}
-    >
-      <ChevronRight className="h-4 w-4" />
-    </Button>
-  </div>
-)}
-
-
     </div>
   );
 }

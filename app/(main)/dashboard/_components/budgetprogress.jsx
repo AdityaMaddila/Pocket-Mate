@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/card";
 import { toast } from "sonner";
 import { updateBudget } from "@/actions/budget";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Pencil, Check, X } from "lucide-react";
 import useFetch from "@/hooks/use-fetch";
@@ -19,7 +19,7 @@ const BudgetProgress = ({ initialBudget, currentExpenses }) => {
     initialBudget?.amount.toString() || ""
   );
 
-  const percentageUsed = initialBudget
+  let percentageUsed = initialBudget
     ? (currentExpenses / initialBudget.amount) * 100
     : 0;
     const {
@@ -28,6 +28,7 @@ const BudgetProgress = ({ initialBudget, currentExpenses }) => {
         data: updatedBudget,
         error,
     }=useFetch(updateBudget);
+
   const handleUpdateBudget = async () => {
     const amount = parseFloat(newBudget);
     if (isNaN(amount) || amount <= 0) {
@@ -36,10 +37,22 @@ const BudgetProgress = ({ initialBudget, currentExpenses }) => {
     }
     await updateBudgetFn(amount);
 }
+
   const handleCancel = () => {
     setNewBudget(initialBudget?.amount.toString() || "");
     setIsEditing(false);
   };
+
+  useEffect(() => {
+    if (updatedBudget) {
+      toast.success("Budget updated successfully!");
+      setIsEditing(false);
+    }
+    if (error) {
+      toast.error("Failed to update budget. Please try again.");
+    }
+  }, [updatedBudget, error]);
+
 
   return (
     <Card className="bg-zinc-950 text-white border border-zinc-800 shadow-md">
@@ -97,13 +110,23 @@ const BudgetProgress = ({ initialBudget, currentExpenses }) => {
       <CardContent className="pt-0">
         <div className="h-2 w-full bg-zinc-800 rounded-full overflow-hidden mt-2">
           <div
-            className="gradient h-full transition-all duration-300"
+            className={`h-full transition-all duration-300 ${
+              percentageUsed > 90
+                ? "bg-red-500"
+                : percentageUsed > 60
+                ? "bg-yellow-500"
+                : "bg-green-500"
+            }`}
             style={{ width: `${Math.min(percentageUsed, 100)}%` }}
           ></div>
         </div>
-        <p className="text-xs text-zinc-400 mt-2">
-          {percentageUsed.toFixed(0)}% of budget used
-        </p>
+        <div className="flex items-center justify-end mt-2">
+          <p className="text-xs text-zinc-400 mt-2">
+            {percentageUsed > 100? percentageUsed=100: percentageUsed.toFixed(2)} % of budget used
+           
+          </p>
+        </div>
+        
       </CardContent>
     </Card>
   );

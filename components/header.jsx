@@ -30,7 +30,7 @@ const Header = () => {
       </div>
 
       <header className="fixed top-0 w-full z-50 backdrop-blur-lg bg-gradient-to-r from-zinc-900/40 via-zinc-800/30 to-zinc-900/40 border-b border-zinc-600/30 shadow-[0_4px_30px_rgba(0,0,0,0.15)] transition-all duration-300">
-        <nav className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
+        <nav className="max-w mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex items-center">
             <Image
@@ -66,7 +66,7 @@ const Header = () => {
 
             <SignedOut>
               <SignInButton forceRedirectUrl="/dashboard">
-                <Button className="bg-blue-600 hover:bg-blue-700 text-white text-base px-5 py-2 rounded-md transition-colors duration-200 shadow-md hover:shadow-lg">
+                <Button className="bg-black hover:bg-zinc-700/50 text-white text-base px-5 py-2 rounded-md transition-colors duration-200 shadow-md hover:shadow-lg">
                   Login
                 </Button>
               </SignInButton>

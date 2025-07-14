@@ -88,7 +88,7 @@ export function AccountCard({ account }) {
 
           <CardContent className="p-0 mt-6 flex-1 flex flex-col justify-center">
             <div className="text-3xl font-bold text-zinc-100">
-              ₹{parseFloat(balance).toFixed(2)}
+              ${parseFloat(balance).toFixed(2)}
             </div>
           </CardContent>
 
