@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { CreateAccountDrawer } from "@/components/createAccountDrawer";
+import { CreateAccountDrawer } from "@/components/create-account-drawer";
 import { Card, CardContent } from "@/components/ui/card";
 import { Plus, Wallet, TrendingUp } from "lucide-react";
 import { getUserAccounts } from "@/actions/dashboard";

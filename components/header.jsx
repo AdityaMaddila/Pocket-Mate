@@ -13,60 +13,60 @@ const Header = () => {
   const [isPending, startTransition] = useTransition();
 
   const handleNavigation = (path) => {
-    startTransition(() => {
-      router.push(path);
-    });
+    startTransition(() => router.push(path));
   };
 
   return (
     <>
-      {/* Loader Overlay with smooth fade */}
+      {/* Loader Overlay */}
       <div
-        className={`fixed inset-0 z-[100] bg-black/40 backdrop-blur-sm flex items-center justify-center transition-opacity duration-300 ${
+        className={`fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm transition-opacity duration-300 ${
           isPending ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
         }`}
       >
         <Loader2 className="h-10 w-10 text-white animate-spin" />
       </div>
 
-      <header className="fixed top-0 w-full z-50 backdrop-blur-lg bg-gradient-to-r from-zinc-900/40 via-zinc-800/30 to-zinc-900/40 border-b border-zinc-600/30 shadow-[0_4px_30px_rgba(0,0,0,0.15)] transition-all duration-300">
-        <nav className="max-w mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
-          {/* Logo */}
-          <Link href="/" className="flex items-center">
+      {/* Header */}
+      <header className="fixed top-0 left-0 w-full z-50 border-b border-zinc-700/30 backdrop-blur-md bg-gradient-to-r from-zinc-900/60 via-zinc-800/40 to-zinc-900/60 shadow-lg">
+        <nav className="max-w-screen-xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
+          {/* Logo and Brand */}
+          <Link href="/" className="flex items-center gap-3 hover:opacity-90 transition-opacity">
             <Image
               src="/logo.png"
-              alt="Pocket-mate logo"
-              width={160}
-              height={50}
-              className="object-contain h-12 w-auto"
+              alt="Pocket Mate Logo"
+              width={40}
+              height={40}
+              className="object-contain h-10 w-10"
             />
+            <span className="text-xl font-semibold text-white tracking-wide">
+              Pocket Mate
+            </span>
           </Link>
 
-          {/* Navigation / Auth Controls */}
+          {/* Right Controls */}
           <div className="flex items-center gap-4 sm:gap-6">
             <SignedIn>
-              {/* Dashboard Button */}
               <Button
                 onClick={() => handleNavigation("/dashboard")}
-                className="flex items-center gap-2 text-white text-base px-4 py-2 hover:bg-zinc-700/50 transition-colors duration-200 rounded-md"
+                className="flex items-center gap-2 text-white px-4 py-2 rounded-lg hover:bg-zinc-700/50 transition-colors duration-200 border border-zinc-700/40 backdrop-blur-sm"
               >
-                <LayoutDashboard size={20} />
+                <LayoutDashboard className="w-5 h-5" />
                 <span className="hidden md:inline font-medium">Dashboard</span>
               </Button>
 
-              {/* Add Transaction Button */}
               <Button
                 onClick={() => handleNavigation("/transaction/create")}
-                className="flex items-center gap-2 text-white text-base px-4 py-2 hover:bg-zinc-700/50 transition-colors duration-200 rounded-md"
+                className="flex items-center gap-2 text-white px-4 py-2 rounded-lg hover:bg-zinc-700/50 transition-colors duration-200 border border-zinc-700/40 backdrop-blur-sm"
               >
-                <PenBox size={20} />
+                <PenBox className="w-5 h-5" />
                 <span className="hidden md:inline font-medium">Add Transaction</span>
               </Button>
             </SignedIn>
 
             <SignedOut>
               <SignInButton forceRedirectUrl="/dashboard">
-                <Button className="bg-black hover:bg-zinc-700/50 text-white text-base px-5 py-2 rounded-md transition-colors duration-200 shadow-md hover:shadow-lg">
+                <Button className="bg-black hover:bg-zinc-700/50 text-white px-5 py-2 rounded-lg transition-colors border border-zinc-700/40 shadow-md hover:shadow-lg">
                   Login
                 </Button>
               </SignInButton>

@@ -337,7 +337,6 @@ export default function AddTransactionForm({
                     { value: "DAILY", label: "Daily", icon: "📅" },
                     { value: "WEEKLY", label: "Weekly", icon: "📆" },
                     { value: "MONTHLY", label: "Monthly", icon: "🗓️" },
-                    { value: "YEARLY", label: "Yearly", icon: "📊" }
                   ].map((interval) => (
                     <button
                       key={interval.value}
