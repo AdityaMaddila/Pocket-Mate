@@ -2,7 +2,7 @@ import React from "react";
 import { CreateAccountDrawer } from "@/components/createAccountDrawer";
 import { Card, CardContent } from "@/components/ui/card";
 import { Plus } from "lucide-react";
-import getUserAccounts from "@/actions/dashboard";
+import {getUserAccounts} from "@/actions/dashboard";
 import AccountCard from "./_components/AccountCard";
 import { getCurrentBudget } from "@/actions/budget";
 import BudgetProgress from "./_components/budgetprogress";

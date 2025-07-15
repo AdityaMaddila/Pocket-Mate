@@ -64,8 +64,8 @@ export async function createAccount(data) {
   }
 }
 
-export default async function getUserAccounts() {
-        const { userId } = await auth();
+export async function getUserAccounts() {
+    const { userId } = await auth();
     if (!userId) throw new Error("Unauthorized user");
 
     const user = await db.user.findUnique({
