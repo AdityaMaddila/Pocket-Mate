@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { transactionSchema } from "@/app/lib/schema";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
-import { createTransaction } from "@/actions/transaction";
+import { createTransaction, updateTransaction } from "@/actions/transaction"; // Added updateTransaction import
 import useFetch from "@/hooks/use-fetch";
 import { format } from "date-fns";
 import { motion } from "framer-motion";
@@ -38,7 +38,7 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { CreateAccountDrawer } from "@/components/create-account-drawer";
 import { Calendar } from "@/components/ui/calendar";
-import Receiptscanner from "./Reciptscanner";
+import ReceiptScanner from "./Receiptscanner";
 
 export default function AddTransactionForm({
   accounts,
@@ -81,7 +81,10 @@ export default function AddTransactionForm({
         },
   });
 
-  const { loading: transactionLoading, fn: transactionFn, data: transactionResult } = useFetch(createTransaction);
+  // FIXED: Use different functions based on edit mode
+  const { loading: transactionLoading, fn: transactionFn, data: transactionResult } = useFetch(
+    editMode ? updateTransaction : createTransaction
+  );
 
   const type = watch("type");
   const isRecurring = watch("isRecurring");
@@ -89,8 +92,15 @@ export default function AddTransactionForm({
 
   const filteredCategories = categories.filter((cat) => cat.type === type);
 
+  // FIXED: Handle both create and update in onSubmit
   const onSubmit = (data) => {
-    transactionFn({ ...data, amount: parseFloat(data.amount) });
+    if (editMode && editId) {
+      // For updates, pass the ID as the first parameter
+      transactionFn(editId, { ...data, amount: parseFloat(data.amount) });
+    } else {
+      // For creates, pass data directly
+      transactionFn({ ...data, amount: parseFloat(data.amount) });
+    }
   };
 
   useEffect(() => {
@@ -150,7 +160,7 @@ export default function AddTransactionForm({
               </div>
             </div>
             <div className="max-w-md">
-              <Receiptscanner onScanComplete={handleScanComplete}/>
+              <ReceiptScanner onScanComplete={handleScanComplete}/>
             </div>
           </div>
         </motion.div>
@@ -356,6 +366,7 @@ export default function AddTransactionForm({
           </div>
 
           {/* Recurring Interval */}
+{/* Recurring Interval */}
           {isRecurring && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -369,27 +380,29 @@ export default function AddTransactionForm({
                   Recurring Schedule
                 </h3>
                 
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full">
                   {[
                     { value: "DAILY", label: "Daily", icon: "📅" },
                     { value: "WEEKLY", label: "Weekly", icon: "📆" },
                     { value: "MONTHLY", label: "Monthly", icon: "🗓️" },
                   ].map((interval) => (
-                    <button
+                    <motion.button
                       key={interval.value}
                       type="button"
                       onClick={() => setValue("recurringInterval", interval.value)}
-                      className={`p-3 rounded-xl border-2 transition-all duration-200 overflow-hidden ${
-                        getValues("recurringInterval") === interval.value
-                          ? "border-blue-500 bg-blue-500/10 text-blue-300"
-                          : "border-zinc-700 bg-zinc-800/50 text-zinc-300 hover:border-zinc-600"
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      className={`w-full p-4 rounded-xl border-2 transition-all duration-300 transform ${
+                        watch("recurringInterval") === interval.value
+                          ? "border-blue-500 bg-blue-500/20 text-blue-300 shadow-lg shadow-blue-500/20"
+                          : "border-zinc-700 bg-zinc-800/50 text-zinc-300 hover:border-zinc-600 hover:bg-zinc-700/50"
                       }`}
                     >
                       <div className="text-center">
-                        <div className="text-xl mb-1">{interval.icon}</div>
+                        <div className="text-2xl mb-2">{interval.icon}</div>
                         <div className="text-sm font-medium">{interval.label}</div>
                       </div>
-                    </button>
+                    </motion.button>
                   ))}
                 </div>
                 {errors.recurringInterval && <p className="text-xs text-red-400 break-words">{errors.recurringInterval.message}</p>}
