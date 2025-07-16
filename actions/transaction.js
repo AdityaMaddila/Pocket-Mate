@@ -2,6 +2,7 @@
 
 import { db } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import { revalidatePath } from "next/cache";
 
 // Helper to convert Prisma Decimal to number
@@ -9,10 +10,9 @@ const serializeAmount = (obj) => ({
   ...obj,
   amount: obj.amount.toNumber(),
 });
+//Gemini INtegration
+const genAi= new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-/**
- * Create a transaction and update account balance.
- */
 export async function createTransaction(data) {
   try {
     const { userId } = await auth();
@@ -113,4 +113,151 @@ export async function getTransaction(id) {
   if (!transaction) throw new Error("Transaction not found");
 
   return serializeAmount(transaction);
+}
+
+export async function scanReceipt(file){
+  try{
+    const model = genAi.getGenerativeModel({model:"gemini-1.5-flash"});
+
+    const arrayBuffer= await file.arrayBuffer();
+
+    const prompt=` Analyze this receipt image and extract the following information in JSON format:
+      - Total amount (just the number)
+      - Date (in ISO format)
+      - Description or items purchased (brief summary)
+      - Merchant/store name
+      - Suggested category (one of: housing,transportation,groceries,utilities,entertainment,food,shopping,healthcare,education,personal,travel,insurance,gifts,bills,other-expense )
+      
+      Only respond with valid JSON in this exact format:
+      {
+        "amount": number,
+        "date": "ISO date string",
+        "description": "string",
+        "merchantName": "string",
+        "category": "string"
+      }
+
+      If its not a receipt, return an empty object`;
+
+    const base64String=Buffer.from(arrayBuffer).toString("base64");
+    const result = await model.generateContent([
+      {
+        inlineData:{
+          data:base64String,
+          mimeType:file.type,
+        },
+      },
+      prompt,
+    ])
+    const response= await result.response;
+    const text=response.text();
+    const cleanedText=text.replace(/```(?:json)?\n?/g,"").trim();
+
+    try {
+      const data=JSON.parse(cleanedText);
+      return{
+        amount:parseFloat(data.amount),
+        date: new Date(data.date),
+        description:data.description,
+        category:data.category,
+        merchantName:data.merchantName,
+      };
+    }catch(parseError){
+      console.error("Error parsing JSON response:",parseError);
+      throw new Error("Invalid response format from Gemini");
+
+    }
+
+  }catch(error){
+    console.error("Error scanning receipt:",error.message);
+    throw new Error("Failed to scan receipt");
+  }
+}
+// Add this function to your existing transaction server action file
+
+export async function updateTransaction(id, data) {
+  try {
+    const { userId } = await auth();
+    if (!userId) throw new Error("User not authenticated");
+
+    const user = await db.user.findUnique({
+      where: { clerkUserId: userId },
+    });
+    if (!user) throw new Error("User not found");
+
+    // Get the existing transaction
+    const existingTransaction = await db.transaction.findUnique({
+      where: {
+        id,
+        userId: user.id,
+      },
+      include: {
+        account: true,
+      },
+    });
+
+    if (!existingTransaction) throw new Error("Transaction not found");
+
+    // Check if the account is being changed
+    const newAccount = await db.account.findUnique({
+      where: {
+        id: data.accountId,
+        userId: user.id,
+      },
+    });
+    if (!newAccount) throw new Error("Account not found");
+
+    const updatedTransaction = await db.$transaction(async (tx) => {
+      // Reverse the old transaction from the old account
+      const oldBalanceChange = existingTransaction.type === "EXPENSE" 
+        ? existingTransaction.amount.toNumber() 
+        : -existingTransaction.amount.toNumber();
+      
+      await tx.account.update({
+        where: { id: existingTransaction.accountId },
+        data: { 
+          balance: existingTransaction.account.balance.toNumber() + oldBalanceChange 
+        },
+      });
+
+      // Apply the new transaction to the new account
+      const newBalanceChange = data.type === "EXPENSE" ? -data.amount : data.amount;
+      const newAccountBalance = newAccount.balance.toNumber() + newBalanceChange;
+
+      await tx.account.update({
+        where: { id: newAccount.id },
+        data: { balance: newAccountBalance },
+      });
+
+      // Update the transaction
+      const updated = await tx.transaction.update({
+        where: { id },
+        data: {
+          type: data.type,
+          amount: data.amount,
+          date: new Date(data.date),
+          description: data.description || "",
+          category: data.category,
+          accountId: newAccount.id,
+          isRecurring: data.isRecurring || false,
+          recurringInterval: data.recurringInterval || null,
+          nextRecurringDate:
+            data.isRecurring && data.recurringInterval
+              ? calculateNextRecurringDate(data.recurringInterval, data.date)
+              : null,
+        },
+      });
+
+      return updated;
+    });
+
+    // Refresh relevant pages
+    revalidatePath("/dashboard");
+    revalidatePath(`/account/${existingTransaction.accountId}`);
+    revalidatePath(`/account/${updatedTransaction.accountId}`);
+
+    return { success: true, data: serializeAmount(updatedTransaction) };
+  } catch (error) {
+    throw new Error(`Transaction update failed: ${error.message}`);
+  }
 }

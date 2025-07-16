@@ -32,11 +32,13 @@ import {
   Repeat, 
   Target,
   TrendingUp,
-  TrendingDown
+  TrendingDown,
+  Scan
 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { CreateAccountDrawer } from "@/components/create-account-drawer";
 import { Calendar } from "@/components/ui/calendar";
+import Receiptscanner from "./Reciptscanner";
 
 export default function AddTransactionForm({
   accounts,
@@ -99,6 +101,18 @@ export default function AddTransactionForm({
     }
   }, [transactionResult, transactionLoading, editMode]);
 
+  const handleScanComplete=(scannedData)=>{
+    if(scannedData){
+      setValue("amount",scannedData.amount.toString());
+      setValue("date",new Date(scannedData.date));
+      if(scannedData.description){
+        setValue("description",scannedData.description);
+      }
+      if(scannedData.category){
+        setValue("category",scannedData.category);
+      }
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 p-4 md:p-8 overflow-hidden">
@@ -118,15 +132,38 @@ export default function AddTransactionForm({
           </p>
         </div>
 
+        {/* Receipt Scanner Section */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.1 }}
+          className="mb-8"
+        >
+          <div className="bg-gradient-to-r from-zinc-800/80 to-zinc-700/80 backdrop-blur-sm border border-zinc-600/50 rounded-2xl p-6 shadow-xl">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center">
+                <Scan className="h-6 w-6 text-blue-400 mr-3" />
+                <div>
+                  <h3 className="text-lg font-semibold text-zinc-100">Quick Receipt Scan</h3>
+                  <p className="text-sm text-zinc-400">Automatically extract transaction details from receipts</p>
+                </div>
+              </div>
+            </div>
+            <div className="max-w-md">
+              <Receiptscanner onScanComplete={handleScanComplete}/>
+            </div>
+          </div>
+        </motion.div>
+
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-8 w-full overflow-hidden">
           {/* Main Content Cards */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 w-full">
             
-            {/* Transaction Type Card - Fixed */}
+            {/* Transaction Type Card */}
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.1 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
               className="lg:col-span-1 bg-zinc-800/70 backdrop-blur-sm border border-zinc-700/60 rounded-2xl p-6 shadow-xl"
             >
               <div className="flex items-center mb-6">
@@ -176,7 +213,7 @@ export default function AddTransactionForm({
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
               className="lg:col-span-2 bg-zinc-800/70 backdrop-blur-sm border border-zinc-700/60 rounded-2xl p-6 shadow-xl overflow-hidden"
             >
               <div className="flex items-center mb-4">
@@ -230,7 +267,7 @@ export default function AddTransactionForm({
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.3 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
               className="bg-zinc-800/70 backdrop-blur-sm border border-zinc-700/60 rounded-2xl p-6 shadow-xl overflow-hidden"
             >
               <div className="space-y-6">
@@ -284,7 +321,7 @@ export default function AddTransactionForm({
             <motion.div
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.4 }}
+              transition={{ duration: 0.6, delay: 0.5 }}
               className="bg-zinc-800/70 backdrop-blur-sm border border-zinc-700/60 rounded-2xl p-6 shadow-xl overflow-hidden"
             >
               <div className="space-y-6">
@@ -364,7 +401,7 @@ export default function AddTransactionForm({
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.5 }}
+            transition={{ duration: 0.6, delay: 0.6 }}
             className="flex flex-col sm:flex-row gap-4 pt-6 w-full overflow-hidden"
           >
             <Button 
