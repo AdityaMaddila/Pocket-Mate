@@ -1,91 +1,105 @@
-"use client";
-
-import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
-import Image from "next/image";
+import React from "react";
+import { Button } from "./ui/button";
+import { PenBox, LayoutDashboard, Sparkles } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
-import { Button } from "@/components/ui/button";
-import { LayoutDashboard, PenBox, Loader2 } from "lucide-react";
+import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
+import { checkUser } from "@/lib/checkUser";
+import Image from "next/image";
 
-const Header = () => {
-  const router = useRouter();
-  const [isPending, startTransition] = useTransition();
-
-  const handleNavigation = (path) => {
-    startTransition(() => router.push(path));
-  };
+const Header = async () => {
+  await checkUser();
 
   return (
-    <>
-      {/* Loader Overlay */}
-      <div
-        className={`fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm transition-opacity duration-300 ${
-          isPending ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
-        }`}
-      >
-        <Loader2 className="h-10 w-10 text-white animate-spin" />
-      </div>
+    <header className="fixed top-0 w-full z-50 bg-zinc-950/30 backdrop-blur-xl border-b-0">
+      {/* Subtle glassmorphism overlay */}
+      <div className="absolute inset-0 bg-white/[0.02] backdrop-blur-2xl" />
+      
+      <div className="container mx-auto px-6 relative">
+        <div className="flex items-center justify-between h-20">
+          {/* Logo Section */}
+          <div className="flex items-center gap-4">
+            <div className="relative">
+              <Image 
+                src="/logo.png" 
+                alt="Pocket Mate" 
+                width={40} 
+                height={40} 
+                className="w-10 h-10 object-contain"
+              />
+            </div>
+            <div className="flex flex-col">
+              <span className="text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+                Pocket Mate
+              </span>
+              <span className="text-xs text-zinc-400 leading-none">Smart Finance</span>
+            </div>
+          </div>
 
-      {/* Header */}
-      <header className="fixed top-0 left-0 w-full z-50 border-b border-zinc-700/30 backdrop-blur-md bg-gradient-to-r from-zinc-900/60 via-zinc-800/40 to-zinc-900/60 shadow-lg">
-        <nav className="max-w-screen-xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
-          {/* Logo and Brand */}
-          <Link href="/" className="flex items-center gap-3 hover:opacity-90 transition-opacity">
-            <Image
-              src="/logo.png"
-              alt="Pocket Mate Logo"
-              width={40}
-              height={40}
-              className="object-contain h-10 w-10"
-            />
-            <span className="text-xl font-semibold text-white tracking-wide">
-              Pocket Mate
-            </span>
-          </Link>
-
-          {/* Right Controls */}
-          <div className="flex items-center gap-4 sm:gap-6">
+          {/* Action Buttons */}
+          <div className="flex items-center gap-4">
             <SignedIn>
-              <Button
-                onClick={() => handleNavigation("/dashboard")}
-                className="flex items-center gap-2 text-white px-4 py-2 rounded-lg hover:bg-zinc-700/50 transition-colors duration-200 border border-zinc-700/40 backdrop-blur-sm"
-              >
-                <LayoutDashboard className="w-5 h-5" />
-                <span className="hidden md:inline font-medium">Dashboard</span>
-              </Button>
+              {/* Dashboard Button */}
+              <Link href="/dashboard">
+                <Button
+                  variant="ghost"
+                  className="relative overflow-hidden bg-zinc-900/30 hover:bg-zinc-800/40 border border-zinc-800/30 hover:border-blue-500/30 text-zinc-300 hover:text-white transition-all duration-300 rounded-xl group px-5 py-2"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  <LayoutDashboard className="w-4 h-4 mr-2 relative z-10" />
+                  <span className="relative z-10">Dashboard</span>
+                </Button>
+              </Link>
 
-              <Button
-                onClick={() => handleNavigation("/transaction/create")}
-                className="flex items-center gap-2 text-white px-4 py-2 rounded-lg hover:bg-zinc-700/50 transition-colors duration-200 border border-zinc-700/40 backdrop-blur-sm"
-              >
-                <PenBox className="w-5 h-5" />
-                <span className="hidden md:inline font-medium">Add Transaction</span>
-              </Button>
+              {/* Add Transaction Button */}
+              <Link href="/transaction/add">
+                <Button
+                  className="relative overflow-hidden bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-medium px-6 py-2 rounded-xl shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 transition-all duration-300 group"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-cyan-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  <PenBox className="w-4 h-4 mr-2 relative z-10" />
+                  <span className="relative z-10">Add Transaction</span>
+                  <Sparkles className="w-3 h-3 ml-2 relative z-10 opacity-70" />
+                </Button>
+              </Link>
+
+              {/* User Button with custom styling */}
+              <div className="relative">
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-full blur-lg" />
+                <div className="relative bg-zinc-900/30 rounded-full p-1 border border-zinc-800/30">
+                  <UserButton 
+                    afterSignOutUrl="/"
+                    appearance={{
+                      elements: {
+                        avatarBox: "w-8 h-8",
+                        userButtonPopoverCard: "bg-zinc-900 border-zinc-800",
+                        userButtonPopoverActionButton: "text-zinc-300 hover:text-white hover:bg-zinc-800"
+                      }
+                    }}
+                  />
+                </div>
+              </div>
             </SignedIn>
 
             <SignedOut>
-              <SignInButton forceRedirectUrl="/dashboard">
-                <Button className="bg-black hover:bg-zinc-700/50 text-white px-5 py-2 rounded-lg transition-colors border border-zinc-700/40 shadow-md hover:shadow-lg">
-                  Login
+              <SignInButton mode="modal">
+                <Button
+                  className="relative overflow-hidden bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-medium px-8 py-2 rounded-xl shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 transition-all duration-300 group"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-cyan-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  <span className="relative z-10 flex items-center gap-2">
+                    Login
+                    <Sparkles className="w-4 h-4 opacity-70" />
+                  </span>
                 </Button>
               </SignInButton>
             </SignedOut>
-
-            <SignedIn>
-              <UserButton
-                appearance={{
-                  elements: {
-                    avatarBox:
-                      "w-11 h-11 rounded-full border border-zinc-600 shadow-inner hover:shadow-md transition-shadow duration-200",
-                  },
-                }}
-              />
-            </SignedIn>
           </div>
-        </nav>
-      </header>
-    </>
+        </div>
+      </div>
+
+      {/* Bottom border glow */}
+      <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-blue-500/50 to-transparent" />
+    </header>
   );
 };
 
