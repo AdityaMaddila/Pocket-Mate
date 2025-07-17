@@ -51,7 +51,7 @@ const Header = async () => {
               </Link>
 
               {/* Add Transaction Button */}
-              <Link href="/transaction/add">
+              <Link href="/transaction/create">
                 <Button
                   className="relative overflow-hidden bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-medium px-6 py-2 rounded-xl shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 transition-all duration-300 group"
                 >
