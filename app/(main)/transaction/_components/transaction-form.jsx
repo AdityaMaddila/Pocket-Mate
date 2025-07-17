@@ -227,7 +227,6 @@ export default function AddTransactionForm({
               className="lg:col-span-2 bg-zinc-800/70 backdrop-blur-sm border border-zinc-700/60 rounded-2xl p-6 shadow-xl overflow-hidden"
             >
               <div className="flex items-center mb-4">
-                <DollarSign className="h-5 w-5 text-blue-400 mr-2 flex-shrink-0" />
                 <h3 className="text-lg font-semibold text-zinc-100 truncate">Amount & Account</h3>
               </div>
               
@@ -235,12 +234,12 @@ export default function AddTransactionForm({
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-zinc-200">Amount</label>
                   <div className="relative">
-                    <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-zinc-400">$</div>
+                    <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-zinc-400"></div>
                     <Input 
                       type="number" 
                       step="0.01" 
                       placeholder="0.00" 
-                      className="pl-8 bg-zinc-800/80 border-zinc-700 text-zinc-100 h-12 text-lg font-medium rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder:text-zinc-400" 
+                      className=" bg-zinc-800/80 border-zinc-700 text-zinc-100 h-12 text-lg font-medium rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder:text-zinc-400" 
                       {...register("amount")} 
                     />
                   </div>

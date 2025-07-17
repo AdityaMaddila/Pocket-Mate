@@ -20,6 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { getCurrencySymbol, useCurrency } from "@/app/context/CurrencyContext";// ✅ useCurrency hook
 
 const DATE_RANGES = {
   "7D": { label: "Last 7 Days", days: 7 },
@@ -31,6 +32,9 @@ const DATE_RANGES = {
 
 export function AccountChart({ transactions }) {
   const [dateRange, setDateRange] = useState("1M");
+
+  const { currency } = useCurrency(); // 🔥 fetch currency from context
+  const currencySymbol = getCurrencySymbol(currency);
 
   const filteredData = useMemo(() => {
     const range = DATE_RANGES[dateRange];
@@ -100,13 +104,15 @@ export function AccountChart({ transactions }) {
           <div className="text-center">
             <p>Total Income</p>
             <p className="text-lg font-bold text-green-400">
-              ${totals.income.toFixed(2)}
+              {currencySymbol}
+              {totals.income.toFixed(2)}
             </p>
           </div>
           <div className="text-center">
             <p>Total Expenses</p>
             <p className="text-lg font-bold text-red-400">
-              ${totals.expense.toFixed(2)}
+              {currencySymbol}
+              {totals.expense.toFixed(2)}
             </p>
           </div>
           <div className="text-center">
@@ -118,7 +124,8 @@ export function AccountChart({ transactions }) {
                   : "text-red-400"
               }`}
             >
-              ${(totals.income - totals.expense).toFixed(2)}
+              {currencySymbol}
+              {(totals.income - totals.expense).toFixed(2)}
             </p>
           </div>
         </div>
@@ -142,7 +149,7 @@ export function AccountChart({ transactions }) {
                 fontSize={12}
                 tickLine={false}
                 axisLine={false}
-                tickFormatter={(value) => `$${value}`}
+                tickFormatter={(value) => `${currencySymbol}${value}`}
               />
               <Tooltip
                 wrapperStyle={{ outline: "none" }}
@@ -154,7 +161,7 @@ export function AccountChart({ transactions }) {
                 }}
                 labelStyle={{ color: "#a1a1aa" }}
                 itemStyle={{ color: "#fff" }}
-                formatter={(value) => [`$${value}`, undefined]}
+                formatter={(value) => [`${currencySymbol}${value}`, undefined]}
               />
               <Legend
                 wrapperStyle={{

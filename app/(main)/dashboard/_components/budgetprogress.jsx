@@ -12,22 +12,20 @@ import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Pencil, Check, X } from "lucide-react";
 import useFetch from "@/hooks/use-fetch";
+import { getCurrencySymbol } from "@/app/context/CurrencyContext";  // Utility function for currency symbols
 
-const BudgetProgress = ({ initialBudget, currentExpenses }) => {
+const BudgetProgress = ({ initialBudget, currentExpenses, currency }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [newBudget, setNewBudget] = useState(
     initialBudget?.amount.toString() || ""
   );
 
-  let percentageUsed = initialBudget
-    ? (currentExpenses / initialBudget.amount) * 100
-    : 0;
-    const {
-        loading: isLoading,
-        fn: updateBudgetFn,
-        data: updatedBudget,
-        error,
-    }=useFetch(updateBudget);
+  const {
+    loading: isLoading,
+    fn: updateBudgetFn,
+    data: updatedBudget,
+    error,
+  } = useFetch(updateBudget);
 
   const handleUpdateBudget = async () => {
     const amount = parseFloat(newBudget);
@@ -36,7 +34,7 @@ const BudgetProgress = ({ initialBudget, currentExpenses }) => {
       return;
     }
     await updateBudgetFn(amount);
-}
+  };
 
   const handleCancel = () => {
     setNewBudget(initialBudget?.amount.toString() || "");
@@ -53,13 +51,19 @@ const BudgetProgress = ({ initialBudget, currentExpenses }) => {
     }
   }, [updatedBudget, error]);
 
+  const percentageUsed = initialBudget
+    ? (currentExpenses / initialBudget.amount) * 100
+    : 0;
+
+  const symbol = getCurrencySymbol(currency);
 
   return (
     <Card className="bg-zinc-950 text-white border border-zinc-800 shadow-md">
       <CardHeader className="space-y-2 pb-3">
         <div className="flex items-start justify-between">
           <CardTitle className="text-lg font-semibold tracking-wide">
-            Monthly Budget <span className="text-zinc-400 text-sm">(Default Account)</span>
+            Monthly Budget{" "}
+            <span className="text-zinc-400 text-sm">(Default Account)</span>
           </CardTitle>
           <Button
             variant="ghost"
@@ -102,7 +106,7 @@ const BudgetProgress = ({ initialBudget, currentExpenses }) => {
 
         <CardDescription className="text-sm text-zinc-400 pt-1">
           {initialBudget
-            ? `$${currentExpenses.toFixed(2)} of $${initialBudget.amount.toFixed(2)} spent`
+            ? `${symbol}${currentExpenses.toFixed(2)} of ${symbol}${initialBudget.amount.toFixed(2)} spent`
             : "No budget set for this account."}
         </CardDescription>
       </CardHeader>
@@ -122,11 +126,9 @@ const BudgetProgress = ({ initialBudget, currentExpenses }) => {
         </div>
         <div className="flex items-center justify-end mt-2">
           <p className="text-xs text-zinc-400 mt-2">
-            {percentageUsed > 100? percentageUsed=100: percentageUsed.toFixed(2)} % of budget used
-           
+            {Math.min(percentageUsed, 100).toFixed(2)}% of budget used
           </p>
         </div>
-        
       </CardContent>
     </Card>
   );

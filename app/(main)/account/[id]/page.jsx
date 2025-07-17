@@ -1,8 +1,9 @@
-import { Suspense } from "react";
+"use client";
+
+import { Suspense, useEffect, useState } from "react";
 import { getAccountWithTransactions } from "@/actions/accounts";
 import { BarLoader } from "react-spinners";
 import { TransactionTable } from "../_components/transactiontable";
-import { notFound } from "next/navigation";
 import { AccountChart } from "../_components/account-chart";
 import {
   TrendingUp,
@@ -14,10 +15,13 @@ import {
   ArrowUpRight,
   ArrowDownRight,
   Calendar,
-  DollarSign
+  DollarSign,
 } from "lucide-react";
+import { useCurrency } from "@/app/context/CurrencyContext";
+import { getCurrencySymbol } from "@/app/lib/currency";
+import { useRouter, useParams } from "next/navigation";
 
-const ActivityFeed = ({ transactions }) => {
+const ActivityFeed = ({ transactions, currencySymbol }) => {
   const recent = transactions
     .sort((a, b) => new Date(b.date) - new Date(a.date))
     .slice(0, 5);
@@ -42,11 +46,10 @@ const ActivityFeed = ({ transactions }) => {
               >
                 <div className="flex items-center gap-3 min-w-0 flex-1">
                   <div
-                    className={`p-2 rounded-lg flex-shrink-0 ${
-                      isExpense
-                        ? "bg-red-500/20 border border-red-500/30"
-                        : "bg-green-500/20 border border-green-500/30"
-                    }`}
+                    className={`p-2 rounded-lg flex-shrink-0 ${isExpense
+                      ? "bg-red-500/20 border border-red-500/30"
+                      : "bg-green-500/20 border border-green-500/30"
+                      }`}
                   >
                     {isExpense ? (
                       <ArrowDownRight className="w-4 h-4 text-red-400" />
@@ -66,11 +69,10 @@ const ActivityFeed = ({ transactions }) => {
                 </div>
                 <div className="text-right flex-shrink-0">
                   <p
-                    className={`font-bold text-sm sm:text-base ${
-                      isExpense ? "text-red-400" : "text-green-400"
-                    }`}
+                    className={`font-bold text-sm sm:text-base ${isExpense ? "text-red-400" : "text-green-400"
+                      }`}
                   >
-                    {isExpense ? "-" : "+"}${tx.amount.toFixed(2)}
+                    {isExpense ? "-" : "+"}{currencySymbol}{tx.amount.toFixed(2)}
                   </p>
                 </div>
               </div>
@@ -89,14 +91,40 @@ const AccountTypeIcon = ({ type }) => {
     credit: <CreditCard className="w-5 h-5 sm:w-6 sm:h-6 text-purple-400" />,
     default: <DollarSign className="w-5 h-5 sm:w-6 sm:h-6 text-cyan-400" />,
   };
-  return icons[type.toLowerCase()] || icons.default;
+  return icons[type?.toLowerCase()] || icons.default;
 };
 
-export default async function AccountPage({ params }) {
-  const accountData = await getAccountWithTransactions(params.id);
-  if (!accountData) notFound();
+export default function AccountPageWrapper() {
+  const params = useParams();
+  const accountId = Array.isArray(params.id) ? params.id[0] : params.id;
+
+  const [accountData, setAccountData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const { currency } = useCurrency();
+  const currencySymbol = getCurrencySymbol(currency);
+  const router = useRouter();
+
+  useEffect(() => {
+    getAccountWithTransactions(accountId)
+      .then((data) => {
+        if (!data) router.push("/404");
+        else {
+          setAccountData(data);
+          setLoading(false);
+        }
+      });
+  }, [accountId]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-zinc-950 text-white">
+        <BarLoader color="#9333ea" />
+      </div>
+    );
+  }
 
   const { transactions, ...account } = accountData;
+
   const balanceChange =
     transactions.length > 0
       ? parseFloat(account.balance) > 0
@@ -110,7 +138,7 @@ export default async function AccountPage({ params }) {
       <div className="flex flex-col xl:flex-row gap-4 sm:gap-6 items-start xl:items-end justify-between">
         <div className="flex-1 min-w-0">
           <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-2 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-full border border-blue-500/30 backdrop-blur-sm mb-3 sm:mb-4">
-            <AccountTypeIcon type={account.type} />
+
             <span className="text-xs sm:text-sm font-medium text-blue-300">
               {account.type.charAt(0).toUpperCase() + account.type.slice(1)} Account
             </span>
@@ -121,7 +149,7 @@ export default async function AccountPage({ params }) {
         </div>
         <div className="text-left xl:text-right w-full xl:w-auto">
           <div className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold mb-2 bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
-            ${parseFloat(account.balance).toFixed(2)}
+            {currencySymbol}{parseFloat(account.balance).toFixed(2)}
           </div>
           <div className="flex items-center gap-2 justify-start xl:justify-end">
             <div className="flex items-center gap-1 px-3 py-1 bg-zinc-800/50 rounded-full border border-zinc-700/50">
@@ -150,23 +178,16 @@ export default async function AccountPage({ params }) {
               <h2 className="text-lg sm:text-xl font-bold text-white">Account Overview</h2>
             </div>
             <div className="relative z-10">
-              <Suspense
-                fallback={
-                  <div className="flex items-center justify-center h-48 sm:h-64">
-                    <BarLoader width={200} color="#9333ea" />
-                  </div>
-                }
-              >
+              <Suspense fallback={<div className="h-48 flex items-center justify-center"><BarLoader /></div>}>
                 <AccountChart transactions={transactions} />
               </Suspense>
             </div>
           </div>
         </div>
-
-        <ActivityFeed transactions={transactions} />
+        <ActivityFeed transactions={transactions} currencySymbol={currencySymbol} />
       </div>
 
-      {/* Table - Keeping Original TransactionTable Component */}
+      {/* Transactions Table */}
       <div className="relative">
         <div className="relative bg-zinc-900/60 backdrop-blur-xl rounded-3xl border border-zinc-800/50 hover:border-zinc-700/80 hover:shadow-2xl hover:shadow-cyan-500/10">
           <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 via-transparent to-purple-500/5 opacity-0 hover:opacity-100 transition-opacity" />
@@ -179,16 +200,9 @@ export default async function AccountPage({ params }) {
             </div>
           </div>
           <div className="relative z-10 p-4 sm:p-6">
-            {/* Enhanced container for better mobile experience */}
             <div className="w-full overflow-hidden">
-              <Suspense
-                fallback={
-                  <div className="flex items-center justify-center h-32">
-                    <BarLoader width={200} color="#9333ea" />
-                  </div>
-                }
-              >
-                <div className="w-full overflow-x-auto">
+              <Suspense fallback={<BarLoader color="#9333ea" />}>
+                <div className="overflow-x-auto">
                   <div className="min-w-[600px] sm:min-w-0">
                     <TransactionTable transactions={transactions} />
                   </div>

@@ -14,11 +14,14 @@ import {
 } from "@/components/ui/card";
 import { UpdateDefaultAccount } from "@/actions/accounts";
 import { toast } from "sonner";
+import { useCurrency, getCurrencySymbol } from "@/app/context/CurrencyContext";
 
 export function AccountCard({ account }) {
   const { name, type, balance, id, isDefault } = account;
   const [isNavigating, setIsNavigating] = useState(false);
   const router = useRouter();
+  const { currency } = useCurrency(); // 👈 currency from context
+  const currencySymbol = getCurrencySymbol(currency); // 👈 get symbol like ₹ or $
 
   const {
     loading: updateDefaultLoading,
@@ -65,7 +68,9 @@ export function AccountCard({ account }) {
         <div className="flex flex-col items-center justify-center h-full space-y-3 text-purple-200 animate-pulse">
           <Loader2 className="w-6 h-6 animate-spin text-purple-500" />
           <p className="text-sm tracking-wide text-purple-300">
-            Loading <span className="font-semibold text-white">{account.name}</span>'s account...
+            Loading{" "}
+            <span className="font-semibold text-white">{account.name}</span>'s
+            account...
           </p>
         </div>
       ) : (
@@ -79,16 +84,13 @@ export function AccountCard({ account }) {
                 {type.charAt(0).toUpperCase() + type.slice(1).toLowerCase()} Account
               </p>
             </div>
-            <Switch
-              checked={isDefault}
-              onClick={handleDefaultChange}
-              
-            />
+            <Switch checked={isDefault} onClick={handleDefaultChange} />
           </CardHeader>
 
           <CardContent className="p-0 mt-6 flex-1 flex flex-col justify-center">
             <div className="text-3xl font-bold text-zinc-100">
-              ${parseFloat(balance).toFixed(2)}
+              {currencySymbol}
+              {parseFloat(balance).toFixed(2)}
             </div>
           </CardContent>
 

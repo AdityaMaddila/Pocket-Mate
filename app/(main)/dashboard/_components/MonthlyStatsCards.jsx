@@ -5,12 +5,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { 
-  TrendingDown, 
-  PiggyBank, 
-  Target, 
-  Plus, 
-  Edit3, 
+import {
+  TrendingDown,
+  PiggyBank,
+  Target,
+  Plus,
+  Edit3,
   Calendar,
   DollarSign,
   X,
@@ -23,14 +23,16 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { useCurrency } from "@/app/context/CurrencyContext";
+import { formatCurrency } from "@/app/lib/formatCurrency"; // assumes formatCurrency uses selected currency from context
 
-const MonthlyStatsCards = ({ 
-  monthlySpending = 0, 
-  savings = 0, 
+const MonthlyStatsCards = ({
+  monthlySpending = 0,
+  savings = 0,
   goals = [],
   onAddGoal,
   onUpdateGoal,
-  onDeleteGoal 
+  onDeleteGoal,
 }) => {
   const [isGoalDialogOpen, setIsGoalDialogOpen] = useState(false);
   const [editingGoal, setEditingGoal] = useState(null);
@@ -39,9 +41,11 @@ const MonthlyStatsCards = ({
     targetAmount: "",
     currentAmount: "",
     deadline: "",
-    description: ""
+    description: "",
   });
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
+  const { currency } = useCurrency();
 
   const handleGoalSubmit = () => {
     if (!goalForm.title || !goalForm.targetAmount) return;
@@ -49,7 +53,7 @@ const MonthlyStatsCards = ({
       ...goalForm,
       targetAmount: parseFloat(goalForm.targetAmount) || 0,
       currentAmount: parseFloat(goalForm.currentAmount) || 0,
-      id: editingGoal?.id || Date.now().toString()
+      id: editingGoal?.id || Date.now().toString(),
     };
 
     if (editingGoal) {
@@ -63,7 +67,7 @@ const MonthlyStatsCards = ({
       targetAmount: "",
       currentAmount: "",
       deadline: "",
-      description: ""
+      description: "",
     });
     setEditingGoal(null);
     setIsGoalDialogOpen(false);
@@ -76,7 +80,7 @@ const MonthlyStatsCards = ({
       targetAmount: goal.targetAmount.toString(),
       currentAmount: goal.currentAmount.toString(),
       deadline: goal.deadline,
-      description: goal.description || ""
+      description: goal.description || "",
     });
     setShowDeleteConfirm(false);
     setIsGoalDialogOpen(true);
@@ -89,13 +93,6 @@ const MonthlyStatsCards = ({
       setEditingGoal(null);
       setShowDeleteConfirm(false);
     }
-  };
-
-  const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD'
-    }).format(amount);
   };
 
   const getGoalProgress = (goal) => {
@@ -121,11 +118,9 @@ const MonthlyStatsCards = ({
           <CardContent>
             <div className="space-y-2">
               <div className="text-3xl font-bold text-red-400">
-                {formatCurrency(monthlySpending)}
+                {formatCurrency(monthlySpending, currency)}
               </div>
-              <p className="text-sm text-zinc-400">
-                Total spent this month
-              </p>
+              <p className="text-sm text-zinc-400">Total spent this month</p>
             </div>
           </CardContent>
         </Card>
@@ -148,11 +143,9 @@ const MonthlyStatsCards = ({
           <CardContent>
             <div className="space-y-2">
               <div className="text-3xl font-bold text-green-400">
-                {formatCurrency(savings)}
+                {formatCurrency(savings, currency)}
               </div>
-              <p className="text-sm text-zinc-400">
-                Total saved this month
-              </p>
+              <p className="text-sm text-zinc-400">Total saved this month</p>
             </div>
           </CardContent>
         </Card>
@@ -343,7 +336,7 @@ const MonthlyStatsCards = ({
               </Dialog>
             </div>
           </CardHeader>
-          <CardContent className="space-y-4">
+       <CardContent className="space-y-4">
             {goals.length === 0 ? (
               <div className="text-center py-6">
                 <div className="p-3 bg-blue-500/10 rounded-full border border-blue-500/20 w-fit mx-auto mb-3">
@@ -371,8 +364,8 @@ const MonthlyStatsCards = ({
                     </div>
                     <div className="space-y-1">
                       <div className="flex justify-between text-xs text-zinc-400">
-                        <span>{formatCurrency(goal.currentAmount)}</span>
-                        <span>{formatCurrency(goal.targetAmount)}</span>
+                        <span>{formatCurrency(goal.currentAmount, currency)}</span>
+                        <span>{formatCurrency(goal.targetAmount, currency)}</span>
                       </div>
                       <div className="w-full bg-zinc-700/50 rounded-full h-2 overflow-hidden">
                         <div

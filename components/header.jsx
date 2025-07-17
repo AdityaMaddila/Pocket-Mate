@@ -5,6 +5,7 @@ import Link from "next/link";
 import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
 import { checkUser } from "@/lib/checkUser";
 import Image from "next/image";
+import MobileMenu from "./MobileMenu";
 
 const Header = async () => {
   await checkUser();
@@ -35,12 +36,11 @@ const Header = async () => {
             </div>
           </Link>
 
-
-          {/* Action Buttons */}
-          <div className="flex items-center gap-2 sm:gap-4">
+          {/* Desktop Action Buttons - Hidden on mobile */}
+          <div className="hidden sm:flex items-center gap-2 sm:gap-4">
             <SignedIn>
-              {/* Dashboard Button - Hidden on mobile, shown on tablet+ */}
-              <Link href="/dashboard" className="hidden sm:block">
+              {/* Dashboard Button */}
+              <Link href="/dashboard">
                 <Button
                   variant="ghost"
                   className="relative overflow-hidden bg-zinc-900/30 hover:bg-zinc-800/40 border border-zinc-800/30 hover:border-blue-500/30 text-zinc-300 hover:text-white transition-all duration-300 rounded-xl group px-3 sm:px-5 py-2 cursor-pointer"
@@ -51,19 +51,7 @@ const Header = async () => {
                 </Button>
               </Link>
 
-              {/* Mobile Dashboard Button - Icon only */}
-              <Link href="/dashboard" className="sm:hidden">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="relative overflow-hidden bg-zinc-900/30 hover:bg-zinc-800/40 border border-zinc-800/30 hover:border-blue-500/30 text-zinc-300 hover:text-white transition-all duration-300 rounded-xl group p-2 cursor-pointer"
-                >
-                  <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                  <LayoutDashboard className="w-4 h-4 relative z-10" />
-                </Button>
-              </Link>
-
-              {/* Add Transaction Button - Responsive sizing */}
+              {/* Add Transaction Button */}
               <Link href="/transaction/create">
                 <Button
                   className="relative overflow-hidden bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-medium px-3 sm:px-6 py-2 rounded-xl shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 transition-all duration-300 group cursor-pointer"
@@ -108,6 +96,9 @@ const Header = async () => {
               </SignInButton>
             </SignedOut>
           </div>
+
+          {/* Mobile Menu - Only visible on mobile */}
+          <MobileMenu />
         </div>
       </div>
 

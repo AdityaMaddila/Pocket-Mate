@@ -19,6 +19,7 @@ model User {
   budgets       Budget[]
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
+  currency  String   @default("INR")
 
   @@map("users")
 }

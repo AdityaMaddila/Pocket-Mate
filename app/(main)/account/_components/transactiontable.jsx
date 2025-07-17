@@ -54,6 +54,8 @@ import { bulkDeleteTransactions } from "@/actions/accounts";
 import useFetch from "@/hooks/use-fetch";
 import { BarLoader } from "react-spinners";
 import { useRouter } from "next/navigation";
+import { useCurrency,getCurrencySymbol } from "@/app/context/CurrencyContext";  // adjust the path if needed
+
 
 const ITEMS_PER_PAGE = 10;
 
@@ -75,6 +77,9 @@ export function TransactionTable({ transactions }) {
   const [recurringFilter, setRecurringFilter] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const router = useRouter();
+  const { currency } = useCurrency();
+  const currencySymbol = getCurrencySymbol(currency);
+
 
   const filteredAndSortedTransactions = useMemo(() => {
     let result = [...transactions];
@@ -360,8 +365,10 @@ export function TransactionTable({ transactions }) {
                         : "text-green-400"
                     )}
                   >
-                    {transaction.type === "EXPENSE" ? "-" : "+"}$
+                    {transaction.type === "EXPENSE" ? "-" : "+"}
+                    {currencySymbol}
                     {transaction.amount.toFixed(2)}
+
                   </TableCell>
                   <TableCell>
                     {transaction.isRecurring ? (
