@@ -115,18 +115,33 @@ export async function getTransaction(id) {
   return serializeAmount(transaction);
 }
 
-export async function scanReceipt(file){
-  try{
-    const model = genAi.getGenerativeModel({model:"gemini-1.5-flash"});
+// Updated scanReceipt function in your server actions file
+export async function scanReceipt(file) {
+  try {
+    // Server-side validation as backup
+    if (file.size > 1024 * 1024) { // 1MB limit
+      throw new Error("Image file is too large. Please compress the image and try again.");
+    }
 
-    const arrayBuffer= await file.arrayBuffer();
+    if (!file.type.startsWith('image/')) {
+      throw new Error("Please upload a valid image file.");
+    }
 
-    const prompt=` Analyze this receipt image and extract the following information in JSON format:
+    console.log('Processing file:', {
+      name: file.name,
+      size: `${(file.size / 1024).toFixed(2)} KB`,
+      type: file.type
+    });
+
+    const model = genAi.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const arrayBuffer = await file.arrayBuffer();
+
+    const prompt = `Analyze this receipt image and extract the following information in JSON format:
       - Total amount (just the number)
       - Date (in ISO format)
       - Description or items purchased (brief summary)
       - Merchant/store name
-      - Suggested category (one of: housing,transportation,groceries,utilities,entertainment,food,shopping,healthcare,education,personal,travel,insurance,gifts,bills,other-expense )
+      - Suggested category (one of: housing,transportation,groceries,utilities,entertainment,food,shopping,healthcare,education,personal,travel,insurance,gifts,bills,other-expense)
       
       Only respond with valid JSON in this exact format:
       {
@@ -137,42 +152,50 @@ export async function scanReceipt(file){
         "category": "string"
       }
 
-      If its not a receipt, return an empty object`;
+      If it's not a receipt, return an empty object`;
 
-    const base64String=Buffer.from(arrayBuffer).toString("base64");
+    const base64String = Buffer.from(arrayBuffer).toString("base64");
     const result = await model.generateContent([
       {
-        inlineData:{
-          data:base64String,
-          mimeType:file.type,
+        inlineData: {
+          data: base64String,
+          mimeType: file.type,
         },
       },
       prompt,
-    ])
-    const response= await result.response;
-    const text=response.text();
-    const cleanedText=text.replace(/```(?:json)?\n?/g,"").trim();
+    ]);
+
+    const response = await result.response;
+    const text = response.text();
+    const cleanedText = text.replace(/```(?:json)?\n?/g, "").trim();
 
     try {
-      const data=JSON.parse(cleanedText);
-      return{
-        amount:parseFloat(data.amount),
-        date: new Date(data.date),
-        description:data.description,
-        category:data.category,
-        merchantName:data.merchantName,
-      };
-    }catch(parseError){
-      console.error("Error parsing JSON response:",parseError);
-      throw new Error("Invalid response format from Gemini");
+      const data = JSON.parse(cleanedText);
+      
+      // Validate the parsed data
+      if (!data.amount && !data.date) {
+        throw new Error("No receipt data found in the image");
+      }
 
+      return {
+        amount: parseFloat(data.amount) || 0,
+        date: new Date(data.date),
+        description: data.description || "Receipt scan",
+        category: data.category || "other-expense",
+        merchantName: data.merchantName || "Unknown",
+      };
+    } catch (parseError) {
+      console.error("Error parsing JSON response:", parseError);
+      console.error("Raw response:", text);
+      throw new Error("Could not extract receipt data. Please ensure the image is clear and contains a receipt.");
     }
 
-  }catch(error){
-    console.error("Error scanning receipt:",error.message);
-    throw new Error("Failed to scan receipt");
+  } catch (error) {
+    console.error("Error scanning receipt:", error.message);
+    throw new Error(`Receipt scanning failed: ${error.message}`);
   }
 }
+
 // Add this function to your existing transaction server action file
 
 export async function updateTransaction(id, data) {
